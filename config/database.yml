@@ -1,6 +1,6 @@
 development:
   adapter: mysql
-  database: gem_template
+  database: migrate_with
   username: root
   password:
   host: localhost

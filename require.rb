@@ -14,15 +14,15 @@ Require do
       gem :require
     end
     email 'mail@wintoni.us'
-    name 'gem_template'
+    name 'migrate_with'
     homepage "http://github.com/winton/#{name}"
     summary ""
     version '0.1.0'
   end
   
-  bin { require 'lib/gem_template' }
-  lib { require 'lib/gem_template/gem_template' }
-  rails_init { require 'lib/gem_template' }
+  bin { require 'lib/migrate_with' }
+  lib { require 'lib/migrate_with/migrate_with' }
+  rails_init { require 'lib/migrate_with' }
   
   rakefile do
     gem(:active_wrapper)
