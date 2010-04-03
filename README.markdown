@@ -1,7 +1,7 @@
 AlsoMigrate
 ===========
 
-Migrate multiple tables with similar schema.
+Migrate multiple tables with similar schema at once.
 
 Requirements
 ------------
