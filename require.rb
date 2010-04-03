@@ -16,7 +16,7 @@ Require do
     email 'mail@wintoni.us'
     name 'also_migrate'
     homepage "http://github.com/winton/#{name}"
-    summary ""
+    summary "Migrate multiple tables with similar schema"
     version '0.1.0'
   end
   
