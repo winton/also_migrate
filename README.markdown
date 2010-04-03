@@ -21,8 +21,8 @@ end
 
 Options:
 
-* <code>:ignore</code> Ignore migrations that apply to certain columns (defaults to none)
-* <code>:indexes</code> Only index certain columns (defaults to all)
+* <code>ignore</code> Ignore migrations that apply to certain columns (defaults to none)
+* <code>indexes</code> Only index certain columns (defaults to all)
 
 That's it!
 ----------
