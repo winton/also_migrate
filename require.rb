@@ -14,15 +14,21 @@ Require do
       gem :require
     end
     email 'mail@wintoni.us'
-    name 'migrate_with'
+    name 'also_migrate'
     homepage "http://github.com/winton/#{name}"
     summary ""
     version '0.1.0'
   end
   
-  bin { require 'lib/migrate_with' }
-  lib { require 'lib/migrate_with/migrate_with' }
-  rails_init { require 'lib/migrate_with' }
+  bin { require 'lib/also_migrate' }
+  
+  lib do
+    require 'lib/also_migrate/base'
+    require 'lib/also_migrate/migration'
+    require 'lib/also_migrate/migrator'
+  end
+  
+  rails_init { require 'lib/also_migrate' }
   
   rakefile do
     gem(:active_wrapper)
@@ -36,6 +42,7 @@ Require do
     require 'require/spec_helper'
     require 'rails/init'
     require 'pp'
+    require 'spec/fixtures/article'
   end
   
   spec_rakefile do

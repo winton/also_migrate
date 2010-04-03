@@ -1,36 +1,32 @@
-GemTemplate
+AlsoMigrate
 ===========
 
-A gem template for new projects.
+Migrate multiple tables with similar schema.
 
 Requirements
 ------------
 
 <pre>
-sudo gem install stencil
+sudo gem install also_migrate
 </pre>
 
-Setup the template
-------------------
-
-You only have to do this once.
+Define the model
+----------------
 
 <pre>
-git clone git@github.com:winton/migrate_with.git
-cd migrate_with
-stencil
+class Article < ActiveRecord::Base
+  also_migrate :article_archives, :ignore => 'moved_at', :indexes => 'id'
+end
 </pre>
 
-Setup a new project
--------------------
+Options:
 
-Do this for every new project.
+* <code>:ignore</code> Ignore migrations that apply to certain columns (defaults to none)
+* <code>:indexes</code> Only index certain columns (defaults to all)
 
-<pre>
-mkdir my_project
-git init
-stencil migrate_with
-rake rename
-</pre>
+That's it!
+----------
 
-The last command does a find-replace (gem\_template -> my\_project) on files and filenames.
+Next time you migrate, <code>article_archives</code> is created if it doesn't exist.
+
+Any new migration applied to <code>articles</code> is automatically applied to <code>article_archives</code>.
