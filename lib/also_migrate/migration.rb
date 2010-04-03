@@ -17,7 +17,6 @@ module AlsoMigrate
 
       def method_missing_with_also_migrate(method, *arguments, &block)
         args = Marshal.load(Marshal.dump(arguments))
-        $log.info method
         method_missing_without_also_migrate(method, *arguments, &block)
 
         supported = [
@@ -40,7 +39,7 @@ module AlsoMigrate
                 tables = config[:tables]
                 
                 # Don't change ignored columns
-                (options[:ignore] || []).each do |column|
+                options[:ignore].each do |column|
                   next if args.include?(column) || args.include?(column.intern)
                 end
 

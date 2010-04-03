@@ -38,7 +38,8 @@ describe AlsoMigrate do
   describe 'no index config' do
     
     before(:each) do
-      Article.also_migrate_config[0][:options] = {}
+      Article.also_migrate_config = nil
+      Article.also_migrate :article_archives
       $db.migrate(1)
       $db.migrate(0)
       $db.migrate(1)

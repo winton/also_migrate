@@ -19,6 +19,7 @@ module AlsoMigrate
             AlsoMigrate.create_tables(klass)
           end
         end
+      ensure
         migrate_without_also_migrate
       end
       
@@ -31,14 +32,13 @@ module AlsoMigrate
         
           def create_tables(klass)
             config = klass.also_migrate_config
-            $log.info config.inspect
             old_table = klass.table_name
             config.each do |config|
               options = config[:options]
               config[:tables].each do |new_table|
                 if !connection.table_exists?(new_table) && connection.table_exists?(old_table)
                   columns = connection.columns(old_table).collect(&:name)
-                  columns -= (options[:ignore] || []).collect(&:to_s)
+                  columns -= options[:ignore].collect(&:to_s)
                   columns.collect! { |col| connection.quote_column_name(col) }
                   engine =
                     if connection.class.to_s.include?('Mysql')
@@ -54,10 +54,7 @@ module AlsoMigrate
                     WHERE false;
                   SQL
                   indexes = options[:indexes]
-                  $log.info indexes.inspect
                   indexes ||= indexed_columns(old_table)
-                  $log.info old_table.inspect
-                  $log.info indexes.inspect
                   indexes.each do |column|
                     connection.add_index(new_table, column)
                   end

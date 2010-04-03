@@ -10,14 +10,18 @@ module AlsoMigrate
     module ClassMethods
       
       def also_migrate(*args)
+        options = args.extract_options!
         @also_migrate_config ||= []
         @also_migrate_config << {
-          :options => args.extract_options!,
-          :tables => args.collect(&:to_s)
+          :tables => args.collect(&:to_s),
+          :options => {
+            :ignore => [ options[:ignore] ].flatten.compact,
+            :indexes => options[:indexes]
+          }
         }
         self.class_eval do
           class <<self
-            attr_reader :also_migrate_config
+            attr_accessor :also_migrate_config
           end
         end
       end
