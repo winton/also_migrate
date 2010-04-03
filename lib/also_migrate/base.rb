@@ -16,7 +16,7 @@ module AlsoMigrate
           :tables => args.collect(&:to_s),
           :options => {
             :ignore => [ options[:ignore] ].flatten.compact,
-            :indexes => options[:indexes]
+            :indexes => options[:indexes] ? [ options[:indexes] ].flatten : nil
           }
         }
         self.class_eval do
