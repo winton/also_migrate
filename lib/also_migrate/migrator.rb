@@ -19,6 +19,9 @@ module AlsoMigrate
             AlsoMigrate.create_tables(klass)
           end
         end
+      rescue Exception => e
+        puts "AlsoMigrate error: #{e.message}"
+        puts e.backtrace.join("\n")
       ensure
         migrate_without_also_migrate
       end
