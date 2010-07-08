@@ -34,7 +34,7 @@ module AlsoMigrate
           end
         
           def create_tables(klass)
-            return if ENV['skip_also_migrate']
+            return if ENV['from_db_test_prepare']
             
             config = klass.also_migrate_config
             return unless config
