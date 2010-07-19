@@ -30,8 +30,8 @@ describe AlsoMigrate do
     end
     
     it "should only add an index for id" do
-      ActiveRecord::Migrator::AlsoMigrate.indexed_columns('articles').should == [ 'id', 'read' ]
-      ActiveRecord::Migrator::AlsoMigrate.indexed_columns('article_archives').should == [ 'id' ]
+      indexed_columns('articles').should == [ 'id', 'read' ]
+      indexed_columns('article_archives').should == [ 'id' ]
     end
   end
   
@@ -46,8 +46,8 @@ describe AlsoMigrate do
     end
   
     it "should add all indexes" do
-      ActiveRecord::Migrator::AlsoMigrate.indexed_columns('articles').should == [ 'id', 'read' ]
-      ActiveRecord::Migrator::AlsoMigrate.indexed_columns('article_archives').should == [ 'id', 'read' ]
+      indexed_columns('articles').should == [ 'id', 'read' ]
+      indexed_columns('article_archives').should == [ 'id', 'read' ]
     end
   end
 end
