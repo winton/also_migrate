@@ -18,8 +18,6 @@ module AlsoMigrate
       def method_missing_with_also_migrate(method, *arguments, &block)
         args = Marshal.load(Marshal.dump(arguments))
         method_missing_without_also_migrate(method, *arguments, &block)
-        
-        return if ENV['from_db_test_prepare']
 
         supported = [
           :add_column, :add_index, :add_timestamps, :change_column,
@@ -35,7 +33,7 @@ module AlsoMigrate
           # Find models
           Object.subclasses_of(ActiveRecord::Base).each do |klass|
             if klass.respond_to?(:also_migrate_config)
-              next unless klass.table_name == table_name && !klass.also_migrate_config.nil?
+              next unless klass.table_name == table_name
               klass.also_migrate_config.each do |config|
                 options = config[:options]
                 tables = config[:tables]
