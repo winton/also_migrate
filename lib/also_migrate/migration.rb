@@ -34,6 +34,7 @@ module AlsoMigrate
           Object.subclasses_of(ActiveRecord::Base).each do |klass|
             if klass.respond_to?(:also_migrate_config)
               next unless klass.table_name == table_name
+              next if klass.also_migrate_config.nil?
               klass.also_migrate_config.each do |config|
                 options = config[:options]
                 tables = config[:tables]
@@ -52,7 +53,11 @@ module AlsoMigrate
                   elsif connection.table_exists?(table)
                     args[0] = table
                     args[1] = table if method == :rename_table
-                    connection.send(method, *args, &block)
+                    begin
+                      connection.send(method, *args, &block)
+                    rescue Exception => e
+                      puts "(also_migrate warning) #{e.message}"
+                    end
                   end
                 end
               end
