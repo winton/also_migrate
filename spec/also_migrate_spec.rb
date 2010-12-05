@@ -35,7 +35,7 @@ describe AlsoMigrate do
         (@old_archive_columns - @new_archive_columns).should == [ 'permalink' ]
       end
     
-      it "should ignore the body column column" do
+      it "should ignore the body column" do
         (columns('articles') - columns('article_archives')).should == [ 'body' ]
         connection.remove_column(:articles, :body)
         (columns('articles') - columns('article_archives')).should == []
