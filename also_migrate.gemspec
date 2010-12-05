@@ -12,8 +12,8 @@ Gem::Specification.new do |s|
   s.authors = ["Winton Welsh"]
   s.email = ["mail@wintoni.us"]
   s.homepage = "http://github.com/winton/also_migrate"
-  s.summary = ""
-  s.description = ""
+  s.summary = "Migrate multiple tables with similar schema at once"
+  s.description = "Migrate multiple tables with similar schema at once"
 
   AlsoMigrate::Gems::TYPES[:gemspec].each do |g|
     s.add_dependency g.to_s, AlsoMigrate::Gems::VERSIONS[g]

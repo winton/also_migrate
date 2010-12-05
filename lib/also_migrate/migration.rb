@@ -18,8 +18,6 @@ module AlsoMigrate
       def method_missing_with_also_migrate(method, *arguments, &block)
         args = Marshal.load(Marshal.dump(arguments))
         method_missing_without_also_migrate(method, *arguments, &block)
-        
-        return if ENV['from_db_test_prepare']
 
         supported = [
           :add_column, :add_index, :add_timestamps, :change_column,
@@ -54,7 +52,11 @@ module AlsoMigrate
                     elsif connection.table_exists?(table)
                       args[0] = table
                       args[1] = table if method == :rename_table
-                      connection.send(method, *args, &block)
+                      begin
+                        connection.send(method, *args, &block)
+                      rescue Exception => e
+                        puts "(also_migrate warning) #{e.message}"
+                      end
                     end
                   end
                 end
