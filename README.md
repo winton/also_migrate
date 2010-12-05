@@ -14,7 +14,7 @@ Define the model
 ----------------
 
 <pre>
-class Article < ActiveRecord::Base
+class Article &lt; ActiveRecord::Base
   also_migrate :article_archives, :ignore => 'moved_at', :indexes => 'id'
 end
 </pre>

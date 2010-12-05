@@ -24,6 +24,8 @@ module AlsoMigrate
             attr_accessor :also_migrate_config
           end
         end
+        ::AlsoMigrate.classes ||= []
+        ::AlsoMigrate.classes << self
       end
     end
   end

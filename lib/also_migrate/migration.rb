@@ -33,28 +33,29 @@ module AlsoMigrate
           table_name = ActiveRecord::Migrator.proper_table_name(args[0])
           
           # Find models
-          Object.subclasses_of(ActiveRecord::Base).each do |klass|
-            if klass.respond_to?(:also_migrate_config)
-              next unless klass.table_name == table_name && !klass.also_migrate_config.nil?
-              klass.also_migrate_config.each do |config|
-                options = config[:options]
-                tables = config[:tables]
-                
-                # Don't change ignored columns
-                options[:ignore].each do |column|
-                  next if args.include?(column) || args.include?(column.intern)
-                end
+          if ::AlsoMigrate.classes
+            ::AlsoMigrate.classes.uniq.each do |klass|
+              if klass.also_migrate_config
+                klass.also_migrate_config.each do |config|
+                  options = config[:options]
+                  tables = config[:tables]
+              
+                  # Don't change ignored columns
+                  options[:ignore].each do |column|
+                    next if args.include?(column) || args.include?(column.intern)
+                  end
 
-                # Run migration
-                config[:tables].each do |table|
-                  if method == :create_table
-                    ActiveRecord::Migrator::AlsoMigrate.create_tables(klass)
-                  elsif method == :add_index && !options[:indexes].nil?
-                    next
-                  elsif connection.table_exists?(table)
-                    args[0] = table
-                    args[1] = table if method == :rename_table
-                    connection.send(method, *args, &block)
+                  # Run migration
+                  config[:tables].each do |table|
+                    if method == :create_table
+                      ActiveRecord::Migrator::AlsoMigrate.create_tables(klass)
+                    elsif method == :add_index && !options[:indexes].nil?
+                      next
+                    elsif connection.table_exists?(table)
+                      args[0] = table
+                      args[1] = table if method == :rename_table
+                      connection.send(method, *args, &block)
+                    end
                   end
                 end
               end
