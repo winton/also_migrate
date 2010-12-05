@@ -1,3 +1,3 @@
 module AlsoMigrate
-  VERSION = "0.1.1" unless defined?(::AlsoMigrate::VERSION)
+  VERSION = "0.2.0" unless defined?(::AlsoMigrate::VERSION)
 end
