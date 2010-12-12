@@ -44,17 +44,17 @@ module AlsoMigrate
               config[:tables].each do |new_table|
                 if !connection.table_exists?(new_table) && connection.table_exists?(old_table)
                   columns = connection.columns(old_table).collect(&:name)
-                  columns -= options[:ignore].collect(&:to_s)
+                  columns -= options[:subtract].collect(&:to_s)
                   columns.collect! { |col| connection.quote_column_name(col) }
-                  engine =
-                    if connection.class.to_s.include?('Mysql')
-                      'ENGINE=' + connection.select_one(<<-SQL)['Engine']
-                        SHOW TABLE STATUS
-                        WHERE Name = '#{old_table}'
-                      SQL
-                    end
                   indexes = options[:indexes]
                   if indexes
+                    engine =
+                      if connection.class.to_s.include?('Mysql')
+                        'ENGINE=' + connection.select_one(<<-SQL)['Engine']
+                          SHOW TABLE STATUS
+                          WHERE Name = '#{old_table}'
+                        SQL
+                      end
                     connection.execute(<<-SQL)
                       CREATE TABLE #{new_table} #{engine}
                       AS SELECT #{columns.join(',')}
@@ -69,6 +69,25 @@ module AlsoMigrate
                       CREATE TABLE #{new_table}
                       LIKE #{old_table};
                     SQL
+                  end
+                end
+                if connection.table_exists?(new_table)
+                  if options[:add] || options[:subtract]
+                    columns = connection.columns(new_table).collect(&:name)
+                  end
+                  if options[:add]
+                    options[:add].each do |column|
+                      unless columns.include?(column[0])
+                        connection.add_column(*([ new_table ] + column))
+                      end
+                    end
+                  end
+                  if options[:subtract]
+                    options[:subtract].each do |column|
+                      if columns.include?(column)
+                        connection.remove_column(new_table, column)
+                      end
+                    end
                   end
                 end
               end

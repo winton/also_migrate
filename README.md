@@ -15,14 +15,25 @@ Define the model
 
 <pre>
 class Article &lt; ActiveRecord::Base
-  also_migrate :article_archives, :ignore => 'moved_at', :indexes => 'id'
+  also_migrate(
+    :article_archives,
+    :add => [
+      # Parameters to ActiveRecord::ConnectionAdapters::SchemaStatements#add_column
+      [ 'deleted_at', :datetime, {} ]
+    ],
+    :subtract => 'restored_at',
+    :ignore => 'deleted_at',
+    :indexes => 'id'
+  )
 end
 </pre>
 
 Options:
 
+* <code>add</code> Create columns that the original table doesn't have (defaults to none)
+* <code>subtract</code> Exclude columns from the original table (defaults to none)
 * <code>ignore</code> Ignore migrations that apply to certain columns (defaults to none)
-* <code>indexes</code> Only index certain columns (defaults to all)
+* <code>indexes</code> Only index certain columns (duplicates all indexes by default)
 
 That's it!
 ----------

@@ -4,69 +4,124 @@ describe AlsoMigrate do
   
   [ "table doesn't exist yet", "table already exists" ].each do |description|
     describe description do
-    
-      before(:each) do
-        reset_fixture
+      describe 'all options' do
         
-        if description == "table already exists"
-          Article.also_migrate :article_archives, :ignore => 'body', :indexes => 'id'
-        end
+        before(:each) do
+          reset_fixture
         
-        $db.migrate(1)
-        $db.migrate(0)
-        $db.migrate(1)
+          if description == "table doesn't exist yet"
+            Article.also_migrate(
+              :article_archives,
+              :add => [
+                [ 'deleted_at', :datetime ]
+              ],
+              :subtract => 'restored_at',
+              :ignore => 'body',
+              :indexes => 'id'
+            )
+          end
         
-        if description == "table doesn't exist yet"
-          Article.also_migrate :article_archives, :ignore => 'body', :indexes => 'id'
           $db.migrate(1)
+          $db.migrate(0)
+          $db.migrate(1)
+        
+          if description == "table already exists"
+            Article.also_migrate(
+              :article_archives,
+              :add => [
+                [ 'deleted_at', :datetime ]
+              ],
+              :subtract => %w(restored_at),
+              :ignore => %w(body),
+              :indexes => %w(id)
+            )
+            $db.migrate(1)
+          end
         end
-      end
-    
-      it 'should migrate both tables up' do
-        migrate_with_state(2)
-        (@new_article_columns - @old_article_columns).should == [ 'permalink' ]
-        (@new_archive_columns - @old_archive_columns).should == [ 'permalink' ]
-      end
+        
+        it "should create the add column" do
+          (columns('article_archives') - columns('articles')).should == [ 'deleted_at' ]
+        end
       
-      it 'should migrate both tables down' do
-        $db.migrate(2)
-        migrate_with_state(1)
-        (@old_article_columns - @new_article_columns).should == [ 'permalink' ]
-        (@old_archive_columns - @new_archive_columns).should == [ 'permalink' ]
-      end
+        it "should not create the subtract column" do
+          (columns('articles') - columns('article_archives')).should == [ 'restored_at' ]
+        end
     
-      it "should ignore the body column" do
-        (columns('articles') - columns('article_archives')).should == [ 'body' ]
-        connection.remove_column(:articles, :body)
-        (columns('articles') - columns('article_archives')).should == []
-      end
+        it 'should migrate both tables up' do
+          migrate_with_state(2)
+          (@new_article_columns - @old_article_columns).should == [ 'permalink' ]
+          (@new_archive_columns - @old_archive_columns).should == [ 'permalink' ]
+        end
       
-      it "should only add an index for id" do
-        indexed_columns('articles').should == [ 'id', 'read' ]
-        indexed_columns('article_archives').should == [ 'id' ]
+        it 'should migrate both tables down' do
+          $db.migrate(2)
+          migrate_with_state(1)
+          (@old_article_columns - @new_article_columns).should == [ 'permalink' ]
+          (@old_archive_columns - @new_archive_columns).should == [ 'permalink' ]
+        end
+    
+        it "should ignore the body column" do
+          (columns('article_archives') - columns('articles')).should == [ 'deleted_at' ]
+          connection.remove_column(:articles, :body)
+          (columns('article_archives') - columns('articles')).should == [ 'body', 'deleted_at' ]
+        end
+      
+        it "should only add an index for id" do
+          indexed_columns('articles').should == [ 'id', 'read' ]
+          indexed_columns('article_archives').should == [ 'id' ]
+        end
       end
       
       describe 'no index config' do
-
+      
         before(:each) do
           reset_fixture
           
-          if description == "table already exists"
+          if description == "table doesn't exist yet"
             Article.also_migrate :article_archives
           end
-
+      
           $db.migrate(0)
           $db.migrate(1)
-
-          if description == "table doesn't exist yet"
+      
+          if description == "table already exists"
             Article.also_migrate :article_archives
             $db.migrate(1)
           end
         end
-
+      
         it "should add all indexes" do
           indexed_columns('articles').should == [ 'id', 'read' ]
           indexed_columns('article_archives').should == [ 'id', 'read' ]
+        end
+      end
+      
+      if description == "table already exists"
+        describe 'add and subtract' do
+        
+          before(:each) do
+            reset_fixture
+          
+            Article.also_migrate :article_archives
+      
+            $db.migrate(0)
+            $db.migrate(1)
+          
+            Article.also_migrate_config = nil
+            Article.also_migrate(
+              :article_archives,
+              :add => [
+                [ 'deleted_at', :datetime ]
+              ],
+              :subtract => 'restored_at'
+            )
+          end
+        
+          it "should add and remove fields" do
+            columns('article_archives').should == %w(id title body read restored_at)
+            $db.migrate(1)
+            columns('article_archives').should == %w(id title body read deleted_at)
+          end
         end
       end
     end

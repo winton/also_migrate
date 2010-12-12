@@ -15,6 +15,8 @@ module AlsoMigrate
         @also_migrate_config << {
           :tables => args.collect(&:to_s),
           :options => {
+            :add => options[:add] ? options[:add] : [],
+            :subtract => [ options[:subtract] ].flatten.compact,
             :ignore => [ options[:ignore] ].flatten.compact,
             :indexes => options[:indexes] ? [ options[:indexes] ].flatten : nil
           }
