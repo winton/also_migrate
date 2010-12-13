@@ -2,12 +2,13 @@ require File.dirname(__FILE__) + '/also_migrate/gems'
 
 AlsoMigrate::Gems.require(:lib)
 
-$:.unshift File.dirname(__FILE__) + '/also_migrate'
+$:.unshift File.dirname(__FILE__)
 
-require 'base'
-require 'migration'
-require 'migrator'
-require 'version'
+require 'also_migrate/version'
+
+require 'also_migrate/base'
+require 'also_migrate/migration'
+require 'also_migrate/migrator'
 
 module AlsoMigrate
   class <<self
