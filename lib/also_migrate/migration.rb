@@ -37,6 +37,8 @@ module AlsoMigrate
                 klass.also_migrate_config.each do |config|
                   options = config[:options]
                   tables = config[:tables]
+                  
+                  next unless config[:table_name] == table_name
               
                   # Don't change ignored columns
                   options[:ignore].each do |column|

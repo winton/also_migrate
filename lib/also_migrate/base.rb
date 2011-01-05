@@ -13,6 +13,7 @@ module AlsoMigrate
         options = args.extract_options!
         @also_migrate_config ||= []
         @also_migrate_config << {
+          :table_name => self.table_name,
           :tables => args.collect(&:to_s),
           :options => {
             :add => options[:add] ? options[:add] : [],
