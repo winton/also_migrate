@@ -6,7 +6,7 @@ email: mail@wintoni.us
 homepage: http://github.com/winton/also_migrate
 summary: Migrate multiple tables with similar schema at once.
 description: Migrate multiple tables with similar schema at once.
-dependencies:
+dependencies: null
 development_dependencies:
   - rake
   - rspec
