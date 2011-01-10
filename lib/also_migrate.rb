@@ -1,10 +1,6 @@
 require File.dirname(__FILE__) + '/also_migrate/gems'
 
-AlsoMigrate::Gems.require(:lib)
-
 $:.unshift File.dirname(__FILE__)
-
-require 'also_migrate/version'
 
 require 'also_migrate/base'
 require 'also_migrate/migration'

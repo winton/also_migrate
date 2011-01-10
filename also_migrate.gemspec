@@ -1,29 +1,31 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib/', __FILE__)
 $:.unshift lib unless $:.include?(lib)
-
+ 
 require 'also_migrate/gems'
-require 'also_migrate/version'
+AlsoMigrate::Gems.gemset ||= ENV['GEMSET'] || :default
 
 Gem::Specification.new do |s|
-  s.name = "also_migrate"
-  s.version = AlsoMigrate::VERSION
-  s.platform = Gem::Platform::RUBY
-  s.authors = ["Winton Welsh"]
-  s.email = ["mail@wintoni.us"]
-  s.homepage = "http://github.com/winton/also_migrate"
-  s.summary = "Migrate multiple tables with similar schema at once"
-  s.description = "Migrate multiple tables with similar schema at once"
+  AlsoMigrate::Gems.gemspec.hash.each do |key, value|
+    if key == 'name' && AlsoMigrate::Gems.gemset != :default
+      s.name = "#{value}-#{AlsoMigrate::Gems.gemset}"
+    elsif key == 'summary' && AlsoMigrate::Gems.gemset == :solo
+      s.summary = value + " (no dependencies)"
+    elsif !%w(dependencies development_dependencies).include?(key)
+      s.send "#{key}=", value
+    end
+  end
 
-  AlsoMigrate::Gems::TYPES[:gemspec].each do |g|
-    s.add_dependency g.to_s, AlsoMigrate::Gems::VERSIONS[g]
+  AlsoMigrate::Gems.dependencies.each do |g|
+    s.add_dependency g.to_s, AlsoMigrate::Gems.versions[g]
   end
   
-  AlsoMigrate::Gems::TYPES[:gemspec_dev].each do |g|
-    s.add_development_dependency g.to_s, AlsoMigrate::Gems::VERSIONS[g]
+  AlsoMigrate::Gems.development_dependencies.each do |g|
+    s.add_development_dependency g.to_s, AlsoMigrate::Gems.versions[g]
   end
 
-  s.files = Dir.glob("{bin,lib}/**/*") + %w(LICENSE README.md)
-  s.executables = Dir.glob("{bin}/*").collect { |f| File.basename(f) }
-  s.require_path = 'lib'
+  s.executables = `git ls-files -- {bin}/*`.split("\n").collect { |f| File.basename(f) }
+  s.files = `git ls-files`.split("\n")
+  s.require_paths = %w(lib)
+  s.test_files = `git ls-files -- {features,test,spec}/*`.split("\n")
 end

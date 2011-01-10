@@ -7,7 +7,7 @@ Requirements
 ------------
 
 <pre>
-sudo gem install also_migrate
+gem install also_migrate
 </pre>
 
 Define the model

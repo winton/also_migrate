@@ -1,7 +1,9 @@
+require 'pp'
+
 $root = File.expand_path('../../', __FILE__)
 require "#{$root}/lib/also_migrate/gems"
 
-AlsoMigrate::Gems.require(:spec)
+AlsoMigrate::Gems.activate :active_wrapper, :rspec
 
 require 'active_wrapper'
 
