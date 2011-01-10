@@ -7,6 +7,7 @@ require 'active_wrapper'
 
 require "#{$root}/lib/also_migrate"
 require "#{$root}/spec/fixtures/article"
+require "#{$root}/spec/fixtures/comment"
 require 'pp'
 
 Spec::Runner.configure do |config|
@@ -85,7 +86,15 @@ def reset_fixture
     Article.also_migrate_config = nil
   end
   
+  if Comment.respond_to?(:also_migrate_config)
+    Comment.also_migrate_config = nil
+  end
+  
   if connection.table_exists?('article_archives')
     connection.execute('DROP TABLE article_archives')
+  end
+  
+  if connection.table_exists?('comment_archives')
+    connection.execute('DROP TABLE comment_archives')
   end
 end

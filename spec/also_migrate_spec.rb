@@ -4,7 +4,7 @@ describe AlsoMigrate do
   
   [ "table doesn't exist yet", "table already exists" ].each do |description|
     describe description do
-      describe 'all options' do
+      describe 'with all options' do
         
         before(:each) do
           reset_fixture
@@ -72,7 +72,7 @@ describe AlsoMigrate do
         end
       end
       
-      describe 'no index config' do
+      describe 'with no index option' do
       
         before(:each) do
           reset_fixture
@@ -96,8 +96,38 @@ describe AlsoMigrate do
         end
       end
       
+      describe "with other table" do
+      
+        before(:each) do
+          reset_fixture
+          
+          if description == "table doesn't exist yet"
+            Article.also_migrate :article_archives
+            Comment.also_migrate :comment_archives
+          end
+      
+          $db.migrate(0)
+          $db.migrate(1)
+          $db.migrate(2)
+          $db.migrate(3)
+      
+          if description == "table already exists"
+            Article.also_migrate :article_archives
+            Comment.also_migrate :comment_archives
+            $db.migrate(3)
+          end
+        end
+      
+        it "should not affect other table" do
+          columns('articles').should == columns('article_archives')
+          columns('comments').should == columns('comment_archives')
+          columns('articles').should == ["id", "title", "body", "read", "restored_at", "permalink"]
+          columns('comments').should == ["id", "header", "description"]
+        end
+      end
+      
       if description == "table already exists"
-        describe 'add and subtract' do
+        describe 'with add and subtract option' do
         
           before(:each) do
             reset_fixture
