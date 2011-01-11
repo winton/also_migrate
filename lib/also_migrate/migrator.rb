@@ -67,7 +67,7 @@ module AlsoMigrate
                   else
                     connection.execute(<<-SQL)
                       CREATE TABLE #{new_table}
-                      LIKE #{old_table};
+                      (LIKE #{old_table});
                     SQL
                   end
                 end
