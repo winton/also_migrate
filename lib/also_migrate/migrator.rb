@@ -55,10 +55,20 @@ module AlsoMigrate
                     connection.add_index(new_table, column)
                   end
                 else
-                  connection.execute(<<-SQL)
-                    CREATE TABLE #{new_table}
-                    LIKE #{config[:source]};
-                  SQL
+                  if connection.class.to_s.include?('SQLite')
+                    col_string = connection.columns(old_table).collect {|c|
+                      "#{c.name} #{c.sql_type}"
+                    }.join(', ')
+                    connection.execute(<<-SQL)
+                      CREATE TABLE #{new_table}
+                      (#{col_string})
+                    SQL
+                  else
+                    connection.execute(<<-SQL)
+                      CREATE TABLE #{new_table}
+                      LIKE #{old_table};
+                    SQL
+                  end
                 end
               end
               if connection.table_exists?(new_table)
