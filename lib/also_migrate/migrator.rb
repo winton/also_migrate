@@ -2,7 +2,7 @@ module AlsoMigrate
   module Migrator
     
     def self.included(base)
-      unless base.respond_to?(:migrate_with_also_migrate)
+      unless base.included_modules.include?(InstanceMethods)
         base.send :include, InstanceMethods
         base.class_eval do
           alias_method :migrate_without_also_migrate, :migrate
