@@ -8,7 +8,6 @@ require 'also_migrate/migrator'
 module AlsoMigrate
   class <<self
     attr_accessor :configuration
-    attr_accessor :log
   end
 end
 
