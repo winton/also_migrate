@@ -1,4 +1,4 @@
 also_migrate:
-  active_wrapper: =0.4.2
+  active_wrapper: =0.4.4
   rake: >=0.8.7
   rspec: ~>1.0

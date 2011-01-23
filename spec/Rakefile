@@ -1,13 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../lib/also_migrate/gems')
 
-AlsoMigrate::Gems.require(:spec_rake)
+AlsoMigrate::Gems.activate(:active_wrapper)
 
 require 'active_wrapper/tasks'
 
 #begin
   ActiveWrapper::Tasks.new(
     :base => File.dirname(__FILE__),
-    :env => 'test'
+    :env => ENV['ENV'] || 'test'
   )
 # rescue Exception
 # end

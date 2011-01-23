@@ -31,35 +31,27 @@ module AlsoMigrate
           table_name = ActiveRecord::Migrator.proper_table_name(args[0])
           
           # Find models
-          if ::AlsoMigrate.classes
-            ::AlsoMigrate.classes.uniq.each do |klass|
-              if klass.also_migrate_config
-                klass.also_migrate_config.each do |config|
-                  options = config[:options]
-                  tables = config[:tables]
-                  
-                  next unless config[:table_name] == table_name
-              
-                  # Don't change ignored columns
-                  options[:ignore].each do |column|
-                    next if args.include?(column) || args.include?(column.intern)
-                  end
+          (::AlsoMigrate.configuration || []).each do |config|
+            next unless config[:source].to_s == table_name
+        
+            # Don't change ignored columns
+            [ config[:ignore] ].flatten.compact.each do |column|
+              next if args.include?(column) || args.include?(column.intern)
+            end
 
-                  # Run migration
-                  config[:tables].each do |table|
-                    if method == :create_table
-                      ActiveRecord::Migrator::AlsoMigrate.create_tables(klass)
-                    elsif method == :add_index && !options[:indexes].nil?
-                      next
-                    elsif connection.table_exists?(table)
-                      args[0] = table
-                      args[1] = table if method == :rename_table
-                      begin
-                        connection.send(method, *args, &block)
-                      rescue Exception => e
-                        puts "(also_migrate warning) #{e.message}"
-                      end
-                    end
+            # Run migration
+            if method == :create_table
+              ActiveRecord::Migrator::AlsoMigrate.create_tables(config)
+            elsif method == :add_index && !config[:indexes].nil?
+              next
+            else
+              [ config[:destination] ].flatten.compact.each do |table|
+                if connection.table_exists?(table)
+                  args[0] = table
+                  begin
+                    connection.send(method, *args, &block)
+                  rescue Exception => e
+                    puts "(also_migrate warning) #{e.message}"
                   end
                 end
               end

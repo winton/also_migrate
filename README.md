@@ -10,13 +10,14 @@ Requirements
 gem install also_migrate
 </pre>
 
-Define the model
-----------------
+Configure
+---------
 
 <pre>
-class Article &lt; ActiveRecord::Base
-  also_migrate(
-    :article_archives,
+AlsoMigrate.configuration = [
+  {
+    :source => 'articles',
+    :destination => 'article_archives',
     :add => [
       # Parameters to ActiveRecord::ConnectionAdapters::SchemaStatements#add_column
       [ 'deleted_at', :datetime, {} ]
@@ -24,12 +25,18 @@ class Article &lt; ActiveRecord::Base
     :subtract => 'restored_at',
     :ignore => 'deleted_at',
     :indexes => 'id'
-  )
-end
+  },
+  {
+    :source => 'users',
+    :destination => [ 'banned_users', 'deleted_users' ]
+  }
+]
 </pre>
 
 Options:
 
+* <code>source</code> Database schema source table
+* <code>destination</code> Database schema destination table (can also be an array of tables)
 * <code>add</code> Create columns that the original table doesn't have (defaults to none)
 * <code>subtract</code> Exclude columns from the original table (defaults to none)
 * <code>ignore</code> Ignore migrations that apply to certain columns (defaults to none)

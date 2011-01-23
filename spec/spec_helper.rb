@@ -8,8 +8,6 @@ AlsoMigrate::Gems.activate :active_wrapper, :rspec
 require 'active_wrapper'
 
 require "#{$root}/lib/also_migrate"
-require "#{$root}/spec/fixtures/article"
-require "#{$root}/spec/fixtures/comment"
 require 'pp'
 
 Spec::Runner.configure do |config|
@@ -84,13 +82,7 @@ def migrate_with_state(version)
 end
 
 def reset_fixture
-  if Article.respond_to?(:also_migrate_config)
-    Article.also_migrate_config = nil
-  end
-  
-  if Comment.respond_to?(:also_migrate_config)
-    Comment.also_migrate_config = nil
-  end
+  AlsoMigrate.configuration = []
   
   if connection.table_exists?('article_archives')
     connection.execute('DROP TABLE article_archives')

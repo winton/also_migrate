@@ -10,15 +10,16 @@ describe AlsoMigrate do
           reset_fixture
         
           if description == "table doesn't exist yet"
-            Article.also_migrate(
-              :article_archives,
+            AlsoMigrate.configuration << {
+              :source => :articles,
+              :destination => :article_archives,
               :add => [
                 [ 'deleted_at', :datetime ]
               ],
               :subtract => 'restored_at',
               :ignore => 'body',
               :indexes => 'id'
-            )
+            }
           end
         
           $db.migrate(1)
@@ -26,15 +27,16 @@ describe AlsoMigrate do
           $db.migrate(1)
         
           if description == "table already exists"
-            Article.also_migrate(
-              :article_archives,
+            AlsoMigrate.configuration << {
+              :source => :articles,
+              :destination => :article_archives,
               :add => [
                 [ 'deleted_at', :datetime ]
               ],
               :subtract => %w(restored_at),
               :ignore => %w(body),
               :indexes => %w(id)
-            )
+            }
             $db.migrate(1)
           end
         end
@@ -78,14 +80,20 @@ describe AlsoMigrate do
           reset_fixture
           
           if description == "table doesn't exist yet"
-            Article.also_migrate :article_archives
+            AlsoMigrate.configuration << {
+              :source => :articles,
+              :destination => :article_archives
+            }
           end
       
           $db.migrate(0)
           $db.migrate(1)
       
           if description == "table already exists"
-            Article.also_migrate :article_archives
+            AlsoMigrate.configuration << {
+              :source => :articles,
+              :destination => :article_archives
+            }
             $db.migrate(1)
           end
         end
@@ -102,8 +110,14 @@ describe AlsoMigrate do
           reset_fixture
           
           if description == "table doesn't exist yet"
-            Article.also_migrate :article_archives
-            Comment.also_migrate :comment_archives
+            AlsoMigrate.configuration << {
+              :source => :articles,
+              :destination => :article_archives
+            }
+            AlsoMigrate.configuration << {
+              :source => :comments,
+              :destination => :comment_archives
+            }
           end
       
           $db.migrate(0)
@@ -112,8 +126,14 @@ describe AlsoMigrate do
           $db.migrate(3)
       
           if description == "table already exists"
-            Article.also_migrate :article_archives
-            Comment.also_migrate :comment_archives
+            AlsoMigrate.configuration << {
+              :source => :articles,
+              :destination => :article_archives
+            }
+            AlsoMigrate.configuration << {
+              :source => :comments,
+              :destination => :comment_archives
+            }
             $db.migrate(3)
           end
         end
@@ -132,19 +152,23 @@ describe AlsoMigrate do
           before(:each) do
             reset_fixture
           
-            Article.also_migrate :article_archives
+            AlsoMigrate.configuration << {
+              :source => :articles,
+              :destination => :article_archives
+            }
       
             $db.migrate(0)
             $db.migrate(1)
           
-            Article.also_migrate_config = nil
-            Article.also_migrate(
-              :article_archives,
+            AlsoMigrate.configuration = []
+            AlsoMigrate.configuration << {
+              :source => :articles,
+              :destination => :article_archives,
               :add => [
                 [ 'deleted_at', :datetime ]
               ],
               :subtract => 'restored_at'
-            )
+            }
           end
         
           it "should add and remove fields" do
