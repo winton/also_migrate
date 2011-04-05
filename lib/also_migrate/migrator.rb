@@ -64,9 +64,12 @@ module AlsoMigrate
                       (#{col_string})
                     SQL
                   else
+                    # Postgres fix
+                    # "CREATE TABLE XXX LIKE YYY" is invalid
+                    # "CREATE TABLE XXX ( LIKE YYY )" is a correct one
                     connection.execute(<<-SQL)
                       CREATE TABLE #{new_table}
-                      LIKE #{config[:source]};
+                      (LIKE #{config[:source]});
                     SQL
                   end
                 end
