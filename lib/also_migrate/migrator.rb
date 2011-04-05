@@ -63,13 +63,20 @@ module AlsoMigrate
                       CREATE TABLE #{new_table}
                       (#{col_string})
                     SQL
-                  else
-                    # Postgres fix
-                    # "CREATE TABLE XXX LIKE YYY" is invalid
-                    # "CREATE TABLE XXX ( LIKE YYY )" is a correct one
+                  elsif connection.class.to_s.include?('PostgreSQL')
+                    # Postgres patch
+                    # 1. Valid table creation
+                    #   "CREATE TABLE XXX LIKE YYY" is invalid
+                    #   "CREATE TABLE XXX ( LIKE YYY )" is a correct one
+                    # 2. Add primary key to new table
                     connection.execute(<<-SQL)
                       CREATE TABLE #{new_table}
-                      (LIKE #{config[:source]});
+                      (LIKE #{config[:source]} INCLUDING INDEXES);
+                    SQL
+                  else
+                    connection.execute(<<-SQL)
+                      CREATE TABLE #{new_table}
+                      LIKE #{config[:source]};
                     SQL
                   end
                 end
