@@ -10,6 +10,3 @@ module AlsoMigrate
     attr_accessor :configuration
   end
 end
-
-ActiveRecord::Migrator.send(:include, AlsoMigrate::Migrator)
-ActiveRecord::Migration.send(:include, AlsoMigrate::Migration)
