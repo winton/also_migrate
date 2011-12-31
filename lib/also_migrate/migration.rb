@@ -3,7 +3,6 @@ module AlsoMigrate
     
     def self.included(base)
       unless base.respond_to?(:method_missing_with_also_migrate)
-        puts "INCLUDING INTO:"+base.inspect
         base.class_eval do
           include InstanceMethods
           alias_method :method_missing_without_also_migrate, :method_missing
@@ -17,7 +16,6 @@ module AlsoMigrate
 
       def method_missing_with_also_migrate(method, *arguments, &block)
         args = Marshal.load(Marshal.dump(arguments))
-        puts "I AM:#{self.inspect}"
         return_value = self.method_missing_without_also_migrate(method, *arguments, &block)
 
         supported = [
