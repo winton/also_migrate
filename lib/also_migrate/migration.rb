@@ -53,7 +53,7 @@ module AlsoMigrate
               next
             else
               [ config[:destination] ].flatten.compact.each do |table|
-                if @connection.table_exists?(table)
+                if @connection.try(:table_exists?, table)
                   args[0] = table
                   begin
                     @connection.send(method, *args, &block)
