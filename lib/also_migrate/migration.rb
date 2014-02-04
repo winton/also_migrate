@@ -3,21 +3,20 @@ module AlsoMigrate
     
     def self.included(base)
       unless base.respond_to?(:method_missing_with_also_migrate)
-        base.extend ClassMethods
         base.class_eval do
-          class <<self
-            alias_method :method_missing_without_also_migrate, :method_missing
-            alias_method :method_missing, :method_missing_with_also_migrate
-          end
+          include InstanceMethods
+          alias_method :method_missing_without_also_migrate, :method_missing
+          alias_method :method_missing, :method_missing_with_also_migrate
         end
       end
     end
 
-    module ClassMethods
+    module InstanceMethods
+
 
       def method_missing_with_also_migrate(method, *arguments, &block)
         args = Marshal.load(Marshal.dump(arguments))
-        return_value = method_missing_without_also_migrate(method, *arguments, &block)
+        return_value = self.method_missing_without_also_migrate(method, *arguments, &block)
 
         supported = [
           :add_column, :add_index, :add_timestamps, :change_column,
